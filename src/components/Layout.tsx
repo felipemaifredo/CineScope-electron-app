@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { Search, Calendar, Settings, Tv } from 'lucide-react'
+import { Search, Calendar, Settings, Tv, List } from 'lucide-react'
 import { cn } from '../utils'
 import { TitleBar } from './TitleBar'
 
@@ -47,6 +47,12 @@ export const Layout = () => {
                             label="Calendar"
                             to="/calendar"
                             active={location.pathname === '/calendar'}
+                        />
+                        <SidebarItem
+                            icon={List}
+                            label="Watchlist"
+                            to="/watchlist"
+                            active={location.pathname === '/watchlist'}
                         />
                         <SidebarItem
                             icon={Settings}

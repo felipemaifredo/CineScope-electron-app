@@ -11,6 +11,7 @@ lerna-debug.log*
 dist-electron/
 dist_electron_build/
 dist-ssr/
+dist
 
 # Node
 node_modules/
