@@ -5,10 +5,12 @@ import { SearchPage } from './pages/SearchPage';
 import { WatchlistPage } from './pages/WatchlistPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { NotificationCheck } from './components/NotificationCheck';
 
 function App() {
   return (
     <WatchlistProvider>
+      <NotificationCheck />
       <HashRouter>
         <Routes>
           <Route path="/" element={<Layout />}>

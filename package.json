@@ -1,9 +1,11 @@
 {
   "name": "cinescope",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "main": "dist-electron/main.js",
+  "author": "felipemaifredo",
+
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
