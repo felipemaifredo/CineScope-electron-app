@@ -1,7 +1,7 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
-import { Search, Calendar, Settings, Tv, List } from 'lucide-react'
-import { cn } from '../utils'
-import { TitleBar } from './TitleBar'
+import { Link, Outlet, useLocation } from "react-router-dom"
+import { Search, Calendar, Settings, Tv, List, Compass } from "lucide-react"
+import { cn } from "../utils"
+import { TitleBar } from "./TitleBar"
 
 const SidebarItem = ({ icon: Icon, label, to, active }: any) => (
     <Link
@@ -41,6 +41,12 @@ export const Layout = () => {
                             label="Search"
                             to="/"
                             active={location.pathname === '/'}
+                        />
+                        <SidebarItem
+                            icon={Compass}
+                            label="Discover"
+                            to="/discover"
+                            active={location.pathname === "/discover"}
                         />
                         <SidebarItem
                             icon={Calendar}

@@ -59,6 +59,11 @@ export interface TMDBEpisode {
     still_path: string | null
 }
 
+export type TMDBGenreTypes = {
+    id: number
+    name: string
+}
+
 export const tmdb = {
     searchSeries: async (query: string): Promise<TMDBSeries[]> => {
         if (!query) return []
@@ -76,5 +81,30 @@ export const tmdb = {
     getSeasonDetails: async (id: number, seasonNumber: number): Promise<TMDBSeason> => {
         const response = await tmdbClient.get(`/tv/${id}/season/${seasonNumber}`)
         return response.data
+    },
+
+    getGenres: async (): Promise<TMDBGenreTypes[]> => {
+        const response = await tmdbClient.get("/genre/tv/list")
+        return response.data.genres
+    },
+
+    discoverSeries: async (options?: {
+        genreIds?: number[]
+        sortBy?: "first_air_date.desc" | "first_air_date.asc"
+    }): Promise<TMDBSeries[]> => {
+        const params: any = {}
+
+        if (options?.genreIds && options.genreIds.length > 0) {
+            params.with_genres = options.genreIds.join(",")
+        }
+
+        if (options?.sortBy) {
+            params.sort_by = options.sortBy
+        } else {
+            params.sort_by = "popularity.desc"
+        }
+
+        const response = await tmdbClient.get("/discover/tv", { params })
+        return response.data.results
     }
 }

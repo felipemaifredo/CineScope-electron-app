@@ -52,10 +52,10 @@ export const SearchPage = () => {
                 </Button>
             </form>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 280px))", justifyContent: "center" }}>
                 {results.map((series) => (
-                    <Card key={series.id} className="group overflow-hidden border-zinc-800 bg-zinc-900/40 hover:border-zinc-700">
-                        <div className="aspect-[2/3] relative overflow-hidden bg-zinc-800">
+                    <Card key={series.id} className="group overflow-hidden border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 max-w-[280px] min-w-[280px]">
+                        <div className="aspect-[2/3] relative overflow-hidden bg-zinc-800 max-h-[420px]">
                             {series.poster_path ? (
                                 <img
                                     src={`https://image.tmdb.org/t/p/w500${series.poster_path}`}
