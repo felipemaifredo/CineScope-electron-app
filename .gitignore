@@ -12,6 +12,8 @@ dist-electron/
 dist_electron_build/
 dist-ssr/
 dist
+out
+release
 
 # Node
 node_modules/

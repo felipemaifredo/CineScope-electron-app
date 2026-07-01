@@ -1,0 +1,13 @@
+appId: com.cinescope.app
+productName: CineScope
+directories:
+  output: release
+win:
+  icon: src/renderer/Resourses/assets/logo/ico/ChatGPT_Image_1_de_jul._de_2026__17_39_44-removebg-preview_Sa_da_2.ico
+  target: nsis
+mac:
+  icon: src/renderer/Resourses/assets/logo/icns/ChatGPT_Image_1_de_jul._de_2026__17_39_44-removebg-preview_Original.icns
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
