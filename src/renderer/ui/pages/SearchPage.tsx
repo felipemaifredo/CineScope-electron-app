@@ -18,23 +18,42 @@ export const SearchPage = () => {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<TMDBSeries[]>([])
   const [loading, setLoading] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
+  const [lastSearchedQuery, setLastSearchedQuery] = useState("")
   const [selectedSeriesId, setSelectedSeriesId] = useState<number | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { addToWatchlist, isInWatchlist } = useWatchlist()
 
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
-    if (!query.trim()) return
-
+  async function performSearch(searchQuery: string, pageNum: number) {
+    if (!searchQuery.trim()) return
     setLoading(true)
     try {
-      const data = await tmdb.searchSeries(query)
-      setResults(data)
+      const data = await tmdb.searchSeries(searchQuery, pageNum)
+      if (pageNum === 1) {
+        setResults(data.results)
+      } else {
+        setResults(function(prev) { return [...prev, ...data.results] })
+      }
+      setHasMore(data.page < data.total_pages)
+      setLastSearchedQuery(searchQuery)
     } catch (error) {
       console.error("Search failed:", error)
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    setPage(1)
+    await performSearch(query, 1)
+  }
+
+  function handleLoadMore() {
+    const nextPage = page + 1
+    setPage(nextPage)
+    performSearch(lastSearchedQuery, nextPage)
   }
 
   function handleCardClick(id: number) {
@@ -130,6 +149,17 @@ export const SearchPage = () => {
           </div>
         )}
       </div>
+
+      {hasMore && (
+        <div className="flex justify-center pt-4 pb-8">
+          <Button 
+            onClick={handleLoadMore}
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Load More"}
+          </Button>
+        </div>
+      )}
 
       <SeriesDetailModal
         isOpen={isModalOpen}

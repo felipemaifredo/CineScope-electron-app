@@ -19,7 +19,9 @@ export const DiscoverPage = () => {
   const [series, setSeries] = useState<TMDBSeries[]>([])
   const [genres, setGenres] = useState<TMDBGenreTypes[]>([])
   const [selectedGenres, setSelectedGenres] = useState<number[]>([])
-  const [sortBy, setSortBy] = useState<"first_air_date.desc" | "first_air_date.asc">("first_air_date.desc")
+  const [sortBy, setSortBy] = useState<"popularity.desc" | "vote_average.desc" | "first_air_date.desc" | "first_air_date.asc">("popularity.desc")
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(false)
   const [showGenreModal, setShowGenreModal] = useState(false)
   const [selectedSeriesId, setSelectedSeriesId] = useState<number | null>(null)
@@ -44,9 +46,15 @@ export const DiscoverPage = () => {
       try {
         const data = await tmdb.discoverSeries({
           genreIds: selectedGenres.length > 0 ? selectedGenres : undefined,
-          sortBy
+          sortBy,
+          page
         })
-        setSeries(data)
+        if (page === 1) {
+          setSeries(data.results)
+        } else {
+          setSeries(function (prev) { return [...prev, ...data.results] })
+        }
+        setHasMore(data.page < data.total_pages)
       } catch (error) {
         console.error("Failed to load series:", error)
       } finally {
@@ -54,7 +62,7 @@ export const DiscoverPage = () => {
       }
     }
     loadSeries()
-  }, [selectedGenres, sortBy])
+  }, [selectedGenres, sortBy, page])
 
   function toggleGenre(genreId: number) {
     setSelectedGenres(function (prev) {
@@ -62,10 +70,12 @@ export const DiscoverPage = () => {
         ? prev.filter(function (id) { return id !== genreId })
         : [...prev, genreId]
     })
+    setPage(1)
   }
 
   function clearGenres() {
     setSelectedGenres([])
+    setPage(1)
   }
 
   function handleCardClick(id: number) {
@@ -114,8 +124,13 @@ export const DiscoverPage = () => {
         <div className="w-full sm:w-auto min-w-[200px]">
           <Select
             value={sortBy}
-            onChange={function (e) { setSortBy(e.target.value as typeof sortBy) }}
+            onChange={function (e) { 
+              setSortBy(e.target.value as typeof sortBy)
+              setPage(1)
+            }}
           >
+            <option value="popularity.desc">Popular (Trending)</option>
+            <option value="vote_average.desc">Top Rated</option>
             <option value="first_air_date.desc">Newest First</option>
             <option value="first_air_date.asc">Oldest First</option>
           </Select>
@@ -138,11 +153,11 @@ export const DiscoverPage = () => {
       )}
 
       <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 280px))", justifyContent: "center" }}>
-        {loading ? (
+        {loading && page === 1 ? (
           <div className="col-span-full py-12 text-center text-zinc-500">
             Loading...
           </div>
-        ) : series.length === 0 ? (
+        ) : series.length === 0 && !loading ? (
           <div className="col-span-full py-12 text-center text-zinc-500 flex flex-col items-center gap-4">
             <Compass size={48} className="opacity-20" />
             <p>No series found with the selected filters.</p>
@@ -201,6 +216,17 @@ export const DiscoverPage = () => {
           })
         )}
       </div>
+
+      {hasMore && (
+        <div className="flex justify-center pt-4 pb-8">
+          <Button 
+            onClick={function() { setPage(function(p) { return p + 1 }) }}
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Load More"}
+          </Button>
+        </div>
+      )}
 
       <Modal
         isOpen={showGenreModal}

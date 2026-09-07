@@ -68,14 +68,21 @@ export type TMDBGenreTypes = {
   name: string
 }
 
+export type TMDBPaginatedResponse<T> = {
+  page: number
+  results: T[]
+  total_pages: number
+  total_results: number
+}
+
 //Main
 export const tmdb = {
-  async searchSeries(query: string): Promise<TMDBSeries[]> {
-    if (!query) return []
+  async searchSeries(query: string, page: number = 1): Promise<TMDBPaginatedResponse<TMDBSeries>> {
+    if (!query) return { page: 1, results: [], total_pages: 0, total_results: 0 }
     const response = await tmdbClient.get("/search/tv", {
-      params: { query }
+      params: { query, page }
     })
-    return response.data.results
+    return response.data
   },
 
   async getSeriesDetails(id: number): Promise<TMDBSeries> {
@@ -95,8 +102,9 @@ export const tmdb = {
 
   async discoverSeries(options?: {
     genreIds?: number[]
-    sortBy?: "first_air_date.desc" | "first_air_date.asc"
-  }): Promise<TMDBSeries[]> {
+    sortBy?: "popularity.desc" | "vote_average.desc" | "first_air_date.desc" | "first_air_date.asc"
+    page?: number
+  }): Promise<TMDBPaginatedResponse<TMDBSeries>> {
     const params: any = {}
 
     if (options?.genreIds && options.genreIds.length > 0) {
@@ -105,11 +113,18 @@ export const tmdb = {
 
     if (options?.sortBy) {
       params.sort_by = options.sortBy
+      if (options.sortBy === "vote_average.desc") {
+        params["vote_count.gte"] = 100
+      }
     } else {
       params.sort_by = "popularity.desc"
     }
 
+    if (options?.page) {
+      params.page = options.page
+    }
+
     const response = await tmdbClient.get("/discover/tv", { params })
-    return response.data.results
+    return response.data
   }
 }
